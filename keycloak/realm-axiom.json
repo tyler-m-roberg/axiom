@@ -1,0 +1,127 @@
+{
+  "realm": "axiom",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "accessTokenLifespan": 600,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 43200,
+  "roles": {
+    "realm": [
+      { "name": "axiom-user", "description": "Standard Axiom user" },
+      { "name": "axiom-admin", "description": "Axiom administrator (bypasses ACLs, manages groups/roles)" }
+    ]
+  },
+  "groups": [
+    { "name": "team-a", "path": "/team-a" },
+    { "name": "team-b", "path": "/team-b" },
+    { "name": "team-admins", "path": "/team-admins", "realmRoles": ["axiom-admin"] }
+  ],
+  "defaultRoles": ["axiom-user"],
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "email": "alice@axiom.local",
+      "firstName": "Alice",
+      "lastName": "Anderson",
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "groups": ["/team-a"],
+      "realmRoles": ["axiom-user"]
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "email": "bob@axiom.local",
+      "firstName": "Bob",
+      "lastName": "Brown",
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "groups": ["/team-b"],
+      "realmRoles": ["axiom-user"]
+    },
+    {
+      "username": "carol",
+      "enabled": true,
+      "email": "carol@axiom.local",
+      "firstName": "Carol",
+      "lastName": "Chen",
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "groups": ["/team-admins"],
+      "realmRoles": ["axiom-user", "axiom-admin"]
+    },
+    {
+      "username": "service-account-axiom-bff",
+      "enabled": true,
+      "serviceAccountClientId": "axiom-bff",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "query-groups",
+          "manage-realm",
+          "view-realm",
+          "manage-clients",
+          "view-clients"
+        ]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "axiom-bff",
+      "name": "Axiom BFF",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "axiom-bff-secret-change-me",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "redirectUris": [
+        "http://localhost:8000/api/auth/callback",
+        "http://localhost:8000/auth/callback"
+      ],
+      "webOrigins": ["http://localhost:5173", "http://localhost:8000"],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:5173##http://localhost:5173/"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "config": {
+            "claim.name": "groups",
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}
