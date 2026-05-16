@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from axiom_api.deps import CurrentUserDep, DbDep
 from axiom_api.models.audit import AuditLog
+from axiom_api.services.authz import accessible_test_ids
 
 router = APIRouter()
 
@@ -20,7 +21,18 @@ def list_audit(
     since: datetime | None = None,
     limit: int = Query(100, le=500),
 ) -> list[dict[str, Any]]:
-    stmt = select(AuditLog).order_by(AuditLog.at.desc()).limit(limit)
+    ids = accessible_test_ids(db, user)
+    if ids is not None:
+        if not ids:
+            return []
+        stmt = (
+            select(AuditLog)
+            .where(AuditLog.test_id.in_(ids))
+            .order_by(AuditLog.at.desc())
+            .limit(limit)
+        )
+    else:
+        stmt = select(AuditLog).order_by(AuditLog.at.desc()).limit(limit)
     if entity_type:
         stmt = stmt.where(AuditLog.entity_type == entity_type)
     if entity_id:
@@ -35,6 +47,7 @@ def list_audit(
             "id": str(r.id),
             "entity_type": r.entity_type,
             "entity_id": r.entity_id,
+            "test_id": str(r.test_id) if r.test_id else None,
             "action": r.action.value,
             "actor_sub": r.actor_sub,
             "actor_username": r.actor_username,

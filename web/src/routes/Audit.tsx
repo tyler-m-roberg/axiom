@@ -15,18 +15,15 @@ import {
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
+import { useMe } from '../auth/AuthGate'
 import type { AuditEntry } from '../types/api'
 
-const entityTypes = [
-  'all',
-  'test',
-  'event',
-  'metadata_field',
-  'test_field_binding',
-  'test_acl',
-] as const
+const baseEntityTypes = ['all', 'test', 'event', 'test_field_binding', 'test_acl'] as const
+const adminEntityTypes = [...baseEntityTypes, 'metadata_field'] as const
 
 export function Audit() {
+  const me = useMe()
+  const entityTypes = me.is_admin ? adminEntityTypes : baseEntityTypes
   const [entityType, setEntityType] = useState<string>('all')
   const [actor, setActor] = useState('')
 

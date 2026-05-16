@@ -89,6 +89,7 @@ export interface AuditEntry {
   id: string
   entity_type: string
   entity_id: string
+  test_id: string | null
   action: 'create' | 'update' | 'delete' | 'promote'
   actor_sub: string | null
   actor_username: string | null

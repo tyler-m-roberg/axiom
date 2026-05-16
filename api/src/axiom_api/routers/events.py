@@ -90,7 +90,7 @@ def create_event(
     db.add(ev)
     db.flush()
     audit.record(
-        db, actor=user, entity_type="event", entity_id=ev.id,
+        db, actor=user, entity_type="event", entity_id=ev.id, test_id=test_id,
         action=AuditAction.CREATE,
         after={"test_id": str(test_id), "name": ev.name, "metadata": validated},
     )
@@ -139,7 +139,7 @@ def update_event(
     ev.updated_by = user.username
 
     audit.record(
-        db, actor=user, entity_type="event", entity_id=ev.id,
+        db, actor=user, entity_type="event", entity_id=ev.id, test_id=ev.test_id,
         action=AuditAction.UPDATE,
         before=before, after={"name": ev.name, "metadata": ev.metadata_values},
     )
@@ -157,7 +157,7 @@ def delete_event(event_id: UUID, user: CurrentUserDep, db: DbDep) -> None:
     ev.deleted_at = datetime.now(tz=timezone.utc)
     ev.updated_by = user.username
     audit.record(
-        db, actor=user, entity_type="event", entity_id=ev.id,
+        db, actor=user, entity_type="event", entity_id=ev.id, test_id=ev.test_id,
         action=AuditAction.DELETE, before={"name": ev.name},
     )
     db.commit()

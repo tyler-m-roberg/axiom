@@ -35,6 +35,7 @@ def record(
     entity_type: str,
     entity_id: str | UUID,
     action: AuditAction,
+    test_id: str | UUID | None = None,
     before: dict[str, Any] | None = None,
     after: dict[str, Any] | None = None,
     context: dict[str, Any] | None = None,
@@ -44,6 +45,7 @@ def record(
     entry = AuditLog(
         entity_type=entity_type,
         entity_id=str(entity_id),
+        test_id=UUID(str(test_id)) if test_id is not None and not isinstance(test_id, UUID) else test_id,
         action=action,
         actor_sub=actor.sub,
         actor_username=actor.username,

@@ -52,6 +52,7 @@ def create_test(payload: TestCreate, user: CurrentUserDep, db: DbDep) -> Test:
         actor=user,
         entity_type="test",
         entity_id=obj.id,
+        test_id=obj.id,
         action=AuditAction.CREATE,
         after={"name": obj.name, "description": obj.description, "metadata": payload.metadata},
     )
@@ -84,7 +85,7 @@ def update_test(test_id: UUID, payload: TestUpdate, user: CurrentUserDep, db: Db
     obj.updated_by = user.username
     after = {"name": obj.name, "description": obj.description, "metadata": obj.metadata_values}
     audit.record(
-        db, actor=user, entity_type="test", entity_id=obj.id,
+        db, actor=user, entity_type="test", entity_id=obj.id, test_id=obj.id,
         action=AuditAction.UPDATE, before=before, after=after,
     )
     db.commit()
@@ -101,7 +102,7 @@ def delete_test(test_id: UUID, user: CurrentUserDep, db: DbDep) -> None:
     obj.deleted_at = datetime.now(tz=timezone.utc)
     obj.updated_by = user.username
     audit.record(
-        db, actor=user, entity_type="test", entity_id=obj.id,
+        db, actor=user, entity_type="test", entity_id=obj.id, test_id=obj.id,
         action=AuditAction.DELETE, before={"name": obj.name},
     )
     db.commit()
@@ -132,7 +133,7 @@ def add_acl(
     db.add(acl)
     db.flush()
     audit.record(
-        db, actor=user, entity_type="test_acl", entity_id=acl.id,
+        db, actor=user, entity_type="test_acl", entity_id=acl.id, test_id=test_id,
         action=AuditAction.CREATE,
         after={"test_id": str(test_id), "group_id": payload.group_id, "permission": payload.permission.value},
     )
@@ -148,7 +149,7 @@ def delete_acl(test_id: UUID, acl_id: UUID, user: CurrentUserDep, db: DbDep) -> 
     if not user.is_admin:
         require_write(db, user, test_id)
     audit.record(
-        db, actor=user, entity_type="test_acl", entity_id=acl.id,
+        db, actor=user, entity_type="test_acl", entity_id=acl.id, test_id=test_id,
         action=AuditAction.DELETE,
         before={"test_id": str(test_id), "group_id": acl.group_id, "permission": acl.permission.value},
     )
@@ -193,7 +194,7 @@ def create_binding(
     db.add(binding)
     db.flush()
     audit.record(
-        db, actor=user, entity_type="test_field_binding", entity_id=binding.id,
+        db, actor=user, entity_type="test_field_binding", entity_id=binding.id, test_id=test_id,
         action=AuditAction.CREATE,
         after={
             "test_id": str(test_id),
@@ -223,7 +224,7 @@ def update_binding(
     binding.requirement = payload.requirement
     binding.updated_by = user.username
     audit.record(
-        db, actor=user, entity_type="test_field_binding", entity_id=binding.id,
+        db, actor=user, entity_type="test_field_binding", entity_id=binding.id, test_id=test_id,
         action=AuditAction.PROMOTE if promoted else AuditAction.UPDATE,
         before=before, after={"requirement": payload.requirement.value},
     )
@@ -240,7 +241,7 @@ def delete_binding(
     if not binding or binding.test_id != test_id:
         raise HTTPException(404, "Binding not found")
     audit.record(
-        db, actor=user, entity_type="test_field_binding", entity_id=binding.id,
+        db, actor=user, entity_type="test_field_binding", entity_id=binding.id, test_id=test_id,
         action=AuditAction.DELETE,
         before={
             "test_id": str(test_id),

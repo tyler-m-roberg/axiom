@@ -25,6 +25,9 @@ class AuditLog(Base):
     )
     entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    test_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True, index=True
+    )
     action: Mapped[AuditAction] = mapped_column(
         PgEnum(AuditAction, name="audit_action"), nullable=False
     )

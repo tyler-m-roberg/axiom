@@ -4,7 +4,9 @@
       "PowerShell(docker compose *)",
       "PowerShell(docker exec axiom-api-1 *)",
       "Bash(python -c \"from axiom_api.main import app; print\\('OK', len\\(app.routes\\)\\)\")",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(npx tsc *)"
     ]
   }
 }
