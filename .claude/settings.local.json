@@ -6,7 +6,10 @@
       "Bash(python -c \"from axiom_api.main import app; print\\('OK', len\\(app.routes\\)\\)\")",
       "Bash(python *)",
       "Bash(grep -E \"\\\\.py$\")",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(git -C .claude/worktrees/fix-acls-500 status)",
+      "Bash(git -C .claude/worktrees/fix-acls-500 log --oneline -10)",
+      "Bash(git *)"
     ]
   }
 }
