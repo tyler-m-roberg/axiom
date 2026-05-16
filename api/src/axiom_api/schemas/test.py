@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from pydantic import AliasChoices, BaseModel, Field
 
@@ -32,6 +33,6 @@ class TestAclCreate(BaseModel):
 
 
 class TestAclOut(AuditedMixin):
-    test_id: str
+    test_id: UUID
     group_id: str
     permission: AclPermission
