@@ -2,11 +2,11 @@ import enum
 import uuid
 from typing import Any
 
-from sqlalchemy import Enum, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from axiom_api.models.base import Base, TimestampedMixin
+from axiom_api.models.base import Base, PgEnum, TimestampedMixin
 
 
 class FieldDataType(str, enum.Enum):
@@ -48,14 +48,14 @@ class MetadataField(Base, TimestampedMixin):
     label: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     data_type: Mapped[FieldDataType] = mapped_column(
-        Enum(FieldDataType, name="field_data_type"), nullable=False, default=FieldDataType.STRING
+        PgEnum(FieldDataType, name="field_data_type"), nullable=False, default=FieldDataType.STRING
     )
     enum_values: Mapped[list[str] | None] = mapped_column(JSONB, nullable=True)
     scope: Mapped[FieldScope] = mapped_column(
-        Enum(FieldScope, name="field_scope"), nullable=False, default=FieldScope.EVENT
+        PgEnum(FieldScope, name="field_scope"), nullable=False, default=FieldScope.EVENT
     )
     status: Mapped[FieldStatus] = mapped_column(
-        Enum(FieldStatus, name="field_status"), nullable=False, default=FieldStatus.ESTABLISHED
+        PgEnum(FieldStatus, name="field_status"), nullable=False, default=FieldStatus.ESTABLISHED
     )
     # Null = shared field; non-null = namespaced to that Keycloak group id
     namespace_group_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -77,12 +77,12 @@ class TestFieldBinding(Base, TimestampedMixin):
         index=True,
     )
     requirement: Mapped[BindingRequirement] = mapped_column(
-        Enum(BindingRequirement, name="binding_requirement"),
+        PgEnum(BindingRequirement, name="binding_requirement"),
         nullable=False,
         default=BindingRequirement.OPTIONAL,
     )
     applies_to: Mapped[BindingApplies] = mapped_column(
-        Enum(BindingApplies, name="binding_applies"),
+        PgEnum(BindingApplies, name="binding_applies"),
         nullable=False,
         default=BindingApplies.EVENT,
     )

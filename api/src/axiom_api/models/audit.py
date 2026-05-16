@@ -3,11 +3,11 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, Enum, String, func
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from axiom_api.models.base import Base
+from axiom_api.models.base import Base, PgEnum
 
 
 class AuditAction(str, enum.Enum):
@@ -26,7 +26,7 @@ class AuditLog(Base):
     entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     action: Mapped[AuditAction] = mapped_column(
-        Enum(AuditAction, name="audit_action"), nullable=False
+        PgEnum(AuditAction, name="audit_action"), nullable=False
     )
     actor_sub: Mapped[str | None] = mapped_column(String(128), nullable=True)
     actor_username: Mapped[str | None] = mapped_column(String(255), nullable=True)

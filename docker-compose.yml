@@ -24,6 +24,9 @@ services:
       KC_HEALTH_ENABLED: "true"
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_HOSTNAME_URL: ${KEYCLOAK_PUBLIC_URL}
+      KC_HOSTNAME_ADMIN_URL: ${KEYCLOAK_PUBLIC_URL}
     ports:
       - "8080:8080"
     volumes:

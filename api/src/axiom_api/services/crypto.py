@@ -1,4 +1,5 @@
 import base64
+import os
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -22,7 +23,7 @@ def encrypt(plaintext: str | None) -> bytes | None:
     if plaintext is None:
         return None
     aesgcm = AESGCM(_key())
-    nonce = AESGCM.generate_key(bit_length=96)[:12]
+    nonce = os.urandom(12)
     ct = aesgcm.encrypt(nonce, plaintext.encode("utf-8"), associated_data=None)
     return nonce + ct
 

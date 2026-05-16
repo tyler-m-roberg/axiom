@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
 
 from axiom_api.models.test_acl import AclPermission
 from axiom_api.schemas.common import AuditedMixin
@@ -21,7 +21,9 @@ class TestUpdate(BaseModel):
 class TestOut(AuditedMixin):
     name: str
     description: str | None = None
-    metadata: dict[str, Any]
+    metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("metadata_values", "metadata")
+    )
 
 
 class TestAclCreate(BaseModel):

@@ -12,17 +12,18 @@
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 43200,
   "roles": {
-    "realm": [
-      { "name": "axiom-user", "description": "Standard Axiom user" },
-      { "name": "axiom-admin", "description": "Axiom administrator (bypasses ACLs, manages groups/roles)" }
-    ]
+    "client": {
+      "axiom-bff": [
+        { "name": "axiom-user", "description": "Standard Axiom user" },
+        { "name": "axiom-admin", "description": "Axiom administrator (bypasses ACLs, manages groups/roles)" }
+      ]
+    }
   },
   "groups": [
     { "name": "team-a", "path": "/team-a" },
     { "name": "team-b", "path": "/team-b" },
-    { "name": "team-admins", "path": "/team-admins", "realmRoles": ["axiom-admin"] }
+    { "name": "team-admins", "path": "/team-admins", "clientRoles": { "axiom-bff": ["axiom-admin"] } }
   ],
-  "defaultRoles": ["axiom-user"],
   "users": [
     {
       "username": "alice",
@@ -33,7 +34,7 @@
       "emailVerified": true,
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "groups": ["/team-a"],
-      "realmRoles": ["axiom-user"]
+      "clientRoles": { "axiom-bff": ["axiom-user"] }
     },
     {
       "username": "bob",
@@ -44,7 +45,7 @@
       "emailVerified": true,
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "groups": ["/team-b"],
-      "realmRoles": ["axiom-user"]
+      "clientRoles": { "axiom-bff": ["axiom-user"] }
     },
     {
       "username": "carol",
@@ -55,7 +56,7 @@
       "emailVerified": true,
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "groups": ["/team-admins"],
-      "realmRoles": ["axiom-user", "axiom-admin"]
+      "clientRoles": { "axiom-bff": ["axiom-user", "axiom-admin"] }
     },
     {
       "username": "service-account-axiom-bff",
@@ -109,11 +110,12 @@
           }
         },
         {
-          "name": "realm roles",
+          "name": "axiom-bff client roles",
           "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
           "config": {
-            "claim.name": "realm_access.roles",
+            "usermodel.clientRoleMapping.clientId": "axiom-bff",
+            "claim.name": "resource_access.axiom-bff.roles",
             "jsonType.label": "String",
             "multivalued": "true",
             "id.token.claim": "true",

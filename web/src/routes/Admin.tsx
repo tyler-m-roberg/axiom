@@ -115,7 +115,7 @@ export function Admin() {
 
       <Paper sx={{ p: 2 }}>
         <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Typography variant="h6">Realm roles</Typography>
+          <Typography variant="h6">Roles (axiom-bff)</Typography>
           <Button variant="contained" onClick={() => setRoleOpen(true)}>
             New role
           </Button>

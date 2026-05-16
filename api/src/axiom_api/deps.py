@@ -34,9 +34,11 @@ async def current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     claims = sess.claims or {}
     roles: list[str] = []
-    realm_access = claims.get("realm_access")
-    if isinstance(realm_access, dict):
-        roles = list(realm_access.get("roles", []))
+    resource_access = claims.get("resource_access")
+    if isinstance(resource_access, dict):
+        bff_access = resource_access.get(settings.keycloak_client_id)
+        if isinstance(bff_access, dict):
+            roles = list(bff_access.get("roles", []))
     groups_raw = claims.get("groups", [])
     groups: list[str] = []
     if isinstance(groups_raw, list):

@@ -37,18 +37,35 @@ def delete_group(group_id: str) -> None:
     _admin().delete_group(group_id)
 
 
+_bff_client_uuid: str | None = None
+
+
+def _get_bff_client_uuid(admin: KeycloakAdmin) -> str:
+    global _bff_client_uuid
+    if _bff_client_uuid is None:
+        _bff_client_uuid = admin.get_client_id(settings.keycloak_client_id)
+    return _bff_client_uuid
+
+
 def list_roles() -> list[dict[str, Any]]:
-    return _admin().get_realm_roles()
+    admin = _admin()
+    return admin.get_client_roles(client_id=_get_bff_client_uuid(admin))
 
 
 def create_role(name: str, description: str | None = None) -> dict[str, Any]:
     admin = _admin()
-    admin.create_realm_role({"name": name, "description": description or ""}, skip_exists=True)
-    return admin.get_realm_role(name)
+    cid = _get_bff_client_uuid(admin)
+    admin.create_client_role(
+        client_role_id=cid,
+        payload={"name": name, "description": description or ""},
+        skip_exists=True,
+    )
+    return admin.get_client_role(client_id=cid, role_name=name)
 
 
 def delete_role(name: str) -> None:
-    _admin().delete_realm_role(role_name=name)
+    admin = _admin()
+    admin.delete_client_role(client_role_id=_get_bff_client_uuid(admin), role_name=name)
 
 
 def get_group_by_path(path: str) -> dict[str, Any] | None:

@@ -1,14 +1,23 @@
+import enum
 import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, Enum, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
+
+def PgEnum(enum_cls: type[enum.Enum], *, name: str) -> Enum:
+    return Enum(
+        enum_cls,
+        name=name,
+        values_callable=lambda e: [m.value for m in e],
+    )
 
 
 class TimestampedMixin:

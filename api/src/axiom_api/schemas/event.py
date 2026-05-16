@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
 
 from axiom_api.schemas.common import AuditedMixin
 
@@ -36,5 +36,7 @@ class EventOut(AuditedMixin):
     test_id: UUID
     name: str | None = None
     occurred_at: datetime | None = None
-    metadata: dict[str, Any]
+    metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("metadata_values", "metadata")
+    )
     on_the_fly_field_ids: list[str] = []

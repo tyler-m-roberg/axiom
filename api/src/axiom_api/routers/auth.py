@@ -48,8 +48,8 @@ async def callback(
 
     tokens = await oidc.exchange_code(code=code, code_verifier=verifier, redirect_uri=REDIRECT_URI)
     user_claims: dict[str, Any] = await oidc.userinfo(tokens.access_token)
-    # Merge any access-token-only claims (e.g. realm_access.roles) we want to surface in /me
-    # via the raw token: claims are populated server-side; access token never reaches SPA.
+    # Merge access-token-only claims we want to surface in /me. The access token never reaches
+    # the SPA; we only use it server-side to populate the session claims dict.
     try:
         import base64
         import json
@@ -57,8 +57,8 @@ async def callback(
         payload = tokens.access_token.split(".")[1]
         payload += "=" * (-len(payload) % 4)
         access_claims = json.loads(base64.urlsafe_b64decode(payload).decode("utf-8"))
-        if isinstance(access_claims.get("realm_access"), dict):
-            user_claims["realm_access"] = access_claims["realm_access"]
+        if isinstance(access_claims.get("resource_access"), dict):
+            user_claims["resource_access"] = access_claims["resource_access"]
         if isinstance(access_claims.get("groups"), list):
             user_claims["groups"] = access_claims["groups"]
     except Exception:
